@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "@heroui/styles"; 
+@theme {
+    --color-main-color: #2ccce4
+}
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
