@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router"; // 👈 استخدام useNavigate بدلاً من window.location
+import { useNavigate } from "react-router";
 import { Avatar } from "@heroui/react";
 import { ArrowLeft, SearchNormal1, UserAdd, UserTick, UserSearch } from "iconsax-reactjs";
 import { toggleFollowUser } from "./FollowerUSer.services";
@@ -9,7 +9,7 @@ import { GetSuggestedFriends } from "../../Components/SuggestedFriends/Suggested
 export default function Suggestions() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const queryClient = useQueryClient();
-  const navigate = useNavigate(); // 👈 تعريف الـ navigate
+  const navigate = useNavigate(); 
 
   const { data, isLoading } = useQuery({
     queryKey: ["allSuggestedFriends", searchQuery],
@@ -33,7 +33,7 @@ export default function Suggestions() {
     <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col gap-6">
       <div>
         <button
-          onClick={() => navigate("/")} // 👈 استخدام navigate بدل window.location.href
+          onClick={() => navigate("/")} 
           className="inline-flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50 transition shadow-xs cursor-pointer"
         >
           <ArrowLeft size="16" />
@@ -75,7 +75,6 @@ export default function Suggestions() {
                 key={user._id}
                 className="flex items-center justify-between p-4 border border-gray-100 rounded-2xl bg-white hover:border-gray-200 transition shadow-2xs"
               >
-                {/* 👈 هنا بنطبع الـ ID في الكونسول ونتنقل بالـ navigate من غير Reload */}
                 <div
                   onClick={() => {
                     console.log("Clicked User ID for Profile Navigation:", user._id);

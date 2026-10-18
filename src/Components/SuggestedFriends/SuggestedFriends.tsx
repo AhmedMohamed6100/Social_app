@@ -13,7 +13,7 @@ export default function SuggestedFriends() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["suggestedFriends", searchQuery],
-    queryFn: () => GetSuggestedFriends(searchQuery, 1),
+    queryFn: () => GetSuggestedFriends(searchQuery, '1'),
     staleTime: 1000 * 60 * 5,
     placeholderData: (previousData) => previousData,
   });
@@ -63,7 +63,6 @@ export default function SuggestedFriends() {
               key={user._id}
               className="flex items-center justify-between p-2.5 border border-gray-100 rounded-xl bg-white hover:border-gray-200 transition shadow-2xs"
             >
-              {/* 👈 هنا تم إضافة الـ console.log و الـ navigate بدون Reload */}
               <div 
                 onClick={() => {
                   console.log("Sidebar Clicked - User ID:", user._id);
@@ -87,7 +86,6 @@ export default function SuggestedFriends() {
                 </div>
               </div>
 
-              {/* زرار الـ Follow */}
               <button
                 onClick={() => followMutation.mutate(user._id)}
                 disabled={followMutation.isPending}

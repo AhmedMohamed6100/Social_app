@@ -3,11 +3,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Avatar } from "@heroui/react";
 import { PostCard } from "../../Components/PostCard/PostCard";
 import Loading from "../../Components/Loading/Loading";
-import AppButton from "../../SharedComponet/AppButton/AppButton"; // عدل المسار حسب مشروعك
+import AppButton from "../../SharedComponet/AppButton/AppButton"; 
 import { ArrowLeft, UserAdd, UserTick } from "iconsax-reactjs";
 
-// 👈 استيراد دوال الـ API من ملف الخدمة الخارجي الخاص بها
-import { getUserProfile, GetUserPosts } from "./UsersProfile.services"; // عدل مسار الملف حسب مكان حفظه لديك
+import { getUserProfile, GetUserPosts } from "./UsersProfile.services"; 
 import { toggleFollowUser } from "../Suggestions/FollowerUSer.services";
 
 export default function UsersProfile() {
@@ -17,21 +16,18 @@ export default function UsersProfile() {
 
   console.log("🔍 [DEBUG] UsersProfile Loaded with ID:", id);
 
-  // 1. جلب بيانات البروفايل (تشمل اليوزر وحالة المتابعة isFollowing)
   const { data: profileData, isLoading: profileLoading } = useQuery({
     queryKey: ["userProfile", id],
     queryFn: () => getUserProfile(id!),
     enabled: !!id,
   });
 
-  // 2. جلب بوستات المستخدم
   const { data: postsData, isLoading: postsLoading } = useQuery({
     queryKey: ["userPosts", id],
     queryFn: () => GetUserPosts(id!),
     enabled: !!id,
   });
 
-  // 3. Mutation للـ Follow / Unfollow
   const followMutation = useMutation({
     mutationFn: (userId: string) => toggleFollowUser(userId),
     onSuccess: () => {
@@ -43,7 +39,6 @@ export default function UsersProfile() {
 
   if (profileLoading || postsLoading) return <Loading />;
 
-  // استخراج البيانات بناءً على الـ Interfaces الصحيحة
   const user = profileData?.data?.user;
   const isFollowing = profileData?.data?.isFollowing;
   const userPosts = postsData?.data?.posts || [];
@@ -119,7 +114,6 @@ export default function UsersProfile() {
 
       </div>
 
-      {/* قسم عرض بوستات المستخدم باستخدام PostCard */}
       <div className="flex flex-col gap-4">
         {userPosts.length > 0 ? (
           userPosts.map((post: any) => (

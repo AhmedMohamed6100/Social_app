@@ -60,10 +60,7 @@ export default function CreateComment({ postId }: { postId: string }) {
           setCommentImage(null);
           setImagePreview(null);
 
-          // استخراج الكومنت الجديد من الـ Response أياً كان شكل الـ Backend
           const newComment = response?.data?.comment || response?.comment || response;
-
-          // تحديث الكاش للتعليقات فوراً لتظهر في الواجهة بدون ريلود
           queryClient.setQueryData(["postsComments", postId], (oldComments: any = []) => {
             if (Array.isArray(oldComments)) {
               return [newComment, ...oldComments];

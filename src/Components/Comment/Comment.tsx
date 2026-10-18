@@ -145,7 +145,6 @@ export default function Comment({
 
   return (
     <div className="flex flex-col gap-2 py-2">
-      {/* الكومنت الرئيسي */}
       <div className="flex items-start gap-3 group relative">
         <Avatar className="w-9 h-9 shrink-0">
           <Avatar.Image alt={commentCreator?.name || "User"} src={commentCreator?.photo || ""} />
@@ -168,7 +167,6 @@ export default function Comment({
                 <span className="text-[11px] text-gray-400">· {formatTimeAgo(createdAt)}</span>
               </div>
 
-              {/* القائمة 3 نقاط للتعديل/الحذف */}
               {isOwner && (
                 <div className="relative">
                   <button
@@ -250,7 +248,6 @@ export default function Comment({
             )}
           </div>
 
-          {/* أزرار التفاعل */}
           <div className="flex items-center gap-4 text-xs text-gray-500 mt-1.5 px-1 font-medium">
             <button
               onClick={() => likeMutation.mutate()}
@@ -305,7 +302,6 @@ export default function Comment({
             <p className="text-xs text-gray-400 py-1">No replies yet.</p>
           )}
 
-          {/* فورم كتابة رد جديد */}
           <div className="flex items-start gap-3 mt-1">
             <Avatar className="w-8 h-8 shrink-0">
               <Avatar.Image alt={userData?.name} src={userData?.photo} />

@@ -20,10 +20,8 @@ export default function MyPostsForMe() {
 
   return (
     <div className="flex gap-5 justify-center max-w-7xl items-start w-full">
-      {/* Main Content */}
       <div className="flex-1 max-w-2xl w-full flex flex-col gap-5">
 
-        {/* Loading */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-12 px-4 bg-white rounded-2xl shadow-sm border border-gray-100 gap-3">
             <div className="w-9 h-9 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
@@ -36,21 +34,18 @@ export default function MyPostsForMe() {
           </div>
         )}
 
-        {/* Error */}
         {isError && (
           <div className="text-center py-10 text-red-500 bg-white rounded-2xl shadow-sm border border-gray-100">
             {error?.message || "Failed to load posts"}
           </div>
         )}
 
-        {/* Empty */}
         {!isLoading && !isError && myPosts.length === 0 && (
           <div className="text-center py-12 text-gray-500 bg-white rounded-2xl shadow-sm border border-gray-100">
             You haven't created any posts yet.
           </div>
         )}
 
-        {/* Posts using PostCard */}
         {!isLoading &&
           !isError &&
           myPosts.map((post: any) => (

@@ -1,10 +1,7 @@
-import React from 'react';
-
 function NotFound() {
     return (
         <div className="min-h-screen bg-white flex flex-col items-center justify-center w-full px-4 overflow-hidden relative">
             
-            {/* خلفية فنية خفيفة - دوائر لبنية مائية */}
             <div className="absolute top-1/4 left-1/10 w-64 h-64 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
             <div className="absolute bottom-1/4 right-1/10 w-72 h-72 bg-sky-100 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-2000"></div>
             <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-cyan-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>

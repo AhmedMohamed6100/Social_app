@@ -25,8 +25,7 @@ export default function MyProfile() {
   const { data: savedPostsData, isLoading: savedLoading } = useQuery({
     queryKey: ["savedPosts", userId],
     queryFn: getSavedPosts,
-    // إزالة شرط الenabled عشان يجيب الداتا أو يستخدم الـ bookmarksCount لو مش متفعلة، 
-    // أو يفضل خليه شغال لو بتجيبه عند الضغط بس هنعالج لو لسه undefined
+   
   });
 
   if (profileLoading) return <Loading />;
@@ -35,10 +34,8 @@ export default function MyProfile() {
   const user = profileData?.data?.user;
   if (!user) return <p className="text-center py-20 text-gray-400">No user data found.</p>;
 
-  // استخراج مصفوفة المحفوظات والعدد الفعلي بناءً عليها أو على الـ user object
   const savedPosts = savedPostsData?.posts || savedPostsData?.data?.posts || savedPostsData || [];
   
-  // 👈 حساب العدد الفعلي (لو مصفوفة الـ savedPosts اتحملت ناخد طولها، لو لا نعتمد على الـ bookmarksCount بتاع اليوزر)
   const savedCount = savedPosts.length > 0 ? savedPosts.length : (user.bookmarksCount ?? 0);
 
   return (
@@ -122,7 +119,6 @@ export default function MyProfile() {
                 <span className="font-bold text-base text-gray-900">9</span>
               </div>
 
-              {/* 👈 هنا تم ربط العدد الفعلي لـ SAVED POSTS */}
               <div className="bg-[#f8fafc] border border-gray-100/80 rounded-2xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <Save2 size="18" className="text-blue-600" />
@@ -167,7 +163,6 @@ export default function MyProfile() {
             </button>
           </div>
 
-          {/* 👈 تحديث العدد في الـ Badge بناءً على التاب النشطة */}
           <span className="bg-blue-50 text-blue-600 text-xs px-2.5 py-0.5 rounded-full font-semibold">
             {activeTab === "posts" ? 9 : savedCount}
           </span>

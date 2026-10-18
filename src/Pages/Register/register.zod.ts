@@ -10,10 +10,7 @@ export const registerSchema = zod.object({
     const userData = new Date(value)
               const currentYear =  new Date();
               return currentYear.getFullYear() - userData.getFullYear() > 20
-              // if() {
-                // return true
-              // }
-              // return "Your Age Must Be Above 20 Years Old"
+       
   }, "Your Age Must Be Above 20 Years Old"),
   gender: zod.enum(["male","female"]),
 }).refine(function(value) {
