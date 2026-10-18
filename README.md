@@ -1,32 +1,51 @@
-# React + TypeScript + Vite
+#  Route Posts — Social Media Web Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A full-featured, modern, and high-performance Social Media Single Page Application (SPA) built using **React 19**, **TypeScript**, **Tailwind CSS**, and **TanStack Query (React Query v5)**. 
 
-Currently, two official plugins are available:
+Designed and developed with a smooth user experience, optimistic UI updates, real-time-like comment replies, and robust profile management.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+##  Developer Information
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Developer:** Ahmed Mohamed Gouda
+* **Role:** Full-Stack / Front-End Software Engineer
+* **University:** 6th of October Technological University (Faculty of Industrial and Energy Technology — IT Department)
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+##  Key Features
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+* **Authentication & Authorization:** Secure user authentication using JWT and custom Axios Interceptors.
+* **Feed & Posts:**
+  * Create, update, share, and delete posts with text and image attachments (`FormData` support).
+  * Smooth infinite-like post interactions (Likes, Shares, and Bookmarks/Save Post).
+  * Dynamic post updates and cache invalidation without full-page reloads.
+* **Interactive Comments & Replies System:**
+  * Top comments preview and detailed view.
+  * Multi-level nested replies for comments.
+  * Emoji picker support and comment image attachments.
+  * Live comment editing and deletion.
+* **User Profiles (`MyProfile` & `UsersProfile`):**
+  * SPA navigation between profiles without page reloads.
+  * Dynamic cover photo & avatar displays.
+  * Tabbed views for **My Posts** and **Saved Posts (Bookmarks)** with live counters.
+  * Follow / Unfollow user logic.
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+---
+
+##  Tech Stack & Libraries
+
+### **Front-End Architecture**
+* **Framework / Library:** React 19, Vite
+* **Language:** TypeScript
+* **State & Data Fetching:** TanStack Query v5 (`@tanstack/react-query`)
+* **Routing:** React Router v7
+* **HTTP Client:** Axios (with custom Interceptors)
+
+### **UI & Styling**
+* **Styling Framework:** Tailwind CSS
+* **Component Library:** HeroUI (`@heroui/react`)
+* **Icons:** Iconsax React (`iconsax-reactjs`)
+* **Utilities:** `emoji-picker-react`
+
