@@ -63,6 +63,8 @@ export function PostCard({
   const [editBody, setEditBody] = useState(post.body || "");
   const [editImage, setEditImage] = useState<File | null>(null);
 
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
   const {
     createdAt,
     _id,
@@ -303,11 +305,14 @@ export function PostCard({
 
       {image && !post.sharedPost && (
         <div className="py-3">
-          <div className="rounded-lg overflow-hidden border border-gray-100 bg-black flex justify-center">
+          <div
+            onClick={() => setPreviewImage(image)}
+            className="rounded-lg overflow-hidden border border-gray-100 bg-black flex justify-center cursor-pointer group relative"
+          >
             <img
               src={image}
-              alt=""
-              className="max-h-[500px] object-contain w-full"
+              alt="Post content"
+              className="max-h-[500px] object-contain w-full transition duration-300 group-hover:opacity-95"
             />
           </div>
         </div>
@@ -337,14 +342,43 @@ export function PostCard({
           )}
 
           {post.sharedPost.image && (
-            <div className="rounded-xl overflow-hidden border border-gray-200 bg-black flex justify-center max-h-[350px]">
+            <div
+              onClick={() => setPreviewImage(post.sharedPost?.image ?? null)}
+              className="rounded-xl overflow-hidden border border-gray-200 bg-black flex justify-center max-h-[350px] cursor-pointer group relative"
+            >
               <img
                 src={post.sharedPost.image}
                 alt="Shared post content"
-                className="object-cover w-full max-h-[350px]"
+                className="object-cover w-full max-h-[350px] transition duration-300 group-hover:opacity-95"
               />
             </div>
           )}
+        </div>
+      )}
+
+      {previewImage && (
+        <div
+          onClick={() => setPreviewImage(null)}
+          className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4"
+        >
+          <div
+            className="relative max-w-5xl max-h-[90vh] w-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* زر الإغلاق */}
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300 bg-black/50 p-2 rounded-full transition cursor-pointer"
+            >
+              <CloseSquare size="28" variant="Outline" />
+            </button>
+            {/* الصورة المكبرة */}
+            <img
+              src={previewImage}
+              alt="Enlarged view"
+              className="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl"
+            />
+          </div>
         </div>
       )}
 
@@ -469,7 +503,6 @@ export function PostCard({
         </div>
       )}
 
-      {/* مودال المشاركة */}
       {isShareModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl flex flex-col overflow-hidden">
@@ -531,7 +564,12 @@ export function PostCard({
             <div className="flex flex-col gap-2">
               {allComments.length > 0 ? (
                 allComments.map((comment: any) => (
-                  <Comment key={comment._id} Comment={comment} postId={_id} />
+                  <Comment
+                    key={comment._id}
+                    Comment={comment}
+                    postId={_id}
+                    postOwnerId={user?._id}
+                  />
                 ))
               ) : (
                 <p className="text-gray-400 text-xs text-center py-2">
@@ -562,6 +600,7 @@ export function PostCard({
                         key={comment._id}
                         Comment={comment}
                         postId={_id}
+                        postOwnerId={user?._id}
                       />
                     ))
                   ) : (
@@ -582,7 +621,13 @@ export function PostCard({
               </div>
             ) : (
               <>
-                {topComment && <Comment Comment={topComment} postId={_id} />}
+                {topComment && (
+                  <Comment
+                    Comment={topComment}
+                    postId={_id}
+                    postOwnerId={user?._id}
+                  />
+                )}
 
                 {commentsCount > 0 && (
                   <button

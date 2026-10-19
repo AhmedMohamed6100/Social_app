@@ -2,28 +2,55 @@ import { Avatar } from "@heroui/react";
 import type { TopComment } from "../../Pages/Posts/Posts.interface";
 import { formatTimeAgo } from "../PostCard/PostCard";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toggleCommentLike, deleteComment, createCommentReply, editComment } from "../CreateComment/CreateComment.services";
+import {
+  toggleCommentLike,
+  deleteComment,
+  createCommentReply,
+  editComment,
+} from "../CreateComment/CreateComment.services";
 import { useContext, useState, useRef } from "react";
 import { UserAuthContext } from "../../Context/UserAuthProvider/UserAuthProvider";
-import { More, Edit, Trash, Heart, Gallery, EmojiHappy, Send2, CloseCircle } from "iconsax-reactjs";
+import {
+  More,
+  Edit,
+  Trash,
+  Heart,
+  Gallery,
+  EmojiHappy,
+  Send2,
+  CloseCircle,
+} from "iconsax-reactjs";
 import EmojiPicker from "emoji-picker-react";
 import { getCommentReplies } from "./Comment.services";
 import type { Reply } from "./Replay.interface";
-
 
 export default function Comment({
   Comment,
   postId,
   isTop = false,
+  postOwnerId,
 }: {
-  Comment: TopComment & { image?: string; replies?: any[]; repliesCount?: number };
+  Comment: TopComment & {
+    image?: string;
+    replies?: any[];
+    repliesCount?: number;
+  };
   postId: string;
   isTop?: boolean;
+  postOwnerId?: string;
 }) {
   const { userData } = useContext(UserAuthContext);
   const currentUserId = userData?._id || userData?.id;
 
-  const { commentCreator, content, createdAt, image, likes, _id: commentId, repliesCount } = Comment;
+  const {
+    commentCreator,
+    content,
+    createdAt,
+    image,
+    likes,
+    _id: commentId,
+    repliesCount,
+  } = Comment;
 
   const queryClient = useQueryClient();
 
@@ -32,15 +59,23 @@ export default function Comment({
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(content || "");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const [isLiked, setIsLiked] = useState<boolean>(likes?.includes(currentUserId));
-  const [likesCountState, setLikesCountState] = useState<number>(likes?.length ?? 0);
+  const [isLiked, setIsLiked] = useState<boolean>(
+    likes?.includes(currentUserId),
+  );
+  const [likesCountState, setLikesCountState] = useState<number>(
+    likes?.length ?? 0,
+  );
+
+  const isCommentOwner = currentUserId === commentCreator?._id;
+  const isPostOwner = currentUserId === postOwnerId;
+  const isOwner = isCommentOwner || isPostOwner; 
 
   const { data: serverReplies = [], refetch: refetchReplies } = useQuery({
     queryKey: ["commentReplies", postId, commentId],
@@ -69,6 +104,7 @@ export default function Comment({
     mutationFn: () => deleteComment(postId, commentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });
 
@@ -88,7 +124,8 @@ export default function Comment({
 
   // 4. Reply Mutation
   const replyMutation = useMutation({
-    mutationFn: (formData: FormData) => createCommentReply(postId, commentId, formData),
+    mutationFn: (formData: FormData) =>
+      createCommentReply(postId, commentId, formData),
     onSuccess: (response: any) => {
       setReplyText("");
       setSelectedImage(null);
@@ -96,12 +133,21 @@ export default function Comment({
       setShowEmojiPicker(false);
       setShowRepliesSection(true);
 
-      const newReply = response?.data?.reply || response?.reply || response?.data?.data || response;
+      const newReply =
+        response?.data?.reply ||
+        response?.reply ||
+        response?.data?.data ||
+        response;
 
-      queryClient.setQueryData(["commentReplies", postId, commentId], (oldReplies: any = []) => {
-        const list = Array.isArray(oldReplies) ? oldReplies : (oldReplies?.data?.replies || []);
-        return [...list, newReply];
-      });
+      queryClient.setQueryData(
+        ["commentReplies", postId, commentId],
+        (oldReplies: any = []) => {
+          const list = Array.isArray(oldReplies)
+            ? oldReplies
+            : oldReplies?.data?.replies || [];
+          return [...list, newReply];
+        },
+      );
 
       refetchReplies();
       queryClient.invalidateQueries({ queryKey: ["postComments", postId] });
@@ -124,7 +170,12 @@ export default function Comment({
     e.preventDefault();
     if (!replyText.trim() && !selectedImage) return;
 
-    console.log("🚀 [DEBUG] Sending reply -> Post ID:", postId, "| Comment ID:", commentId);
+    console.log(
+      "🚀 [DEBUG] Sending reply -> Post ID:",
+      postId,
+      "| Comment ID:",
+      commentId,
+    );
 
     const formData = new FormData();
     if (replyText.trim()) formData.append("content", replyText);
@@ -139,21 +190,34 @@ export default function Comment({
     editMutation.mutate(editText);
   };
 
-  const isOwner = currentUserId === commentCreator?._id;
-  const totalReplies = serverReplies.length > 0 ? serverReplies.length : (repliesCount ?? 0);
-  const username = commentCreator?.username || commentCreator?.name?.toLowerCase().replace(/\s+/g, "") || "user";
+  const totalReplies =
+    serverReplies.length > 0 ? serverReplies.length : (repliesCount ?? 0);
+  const username =
+    commentCreator?.username ||
+    commentCreator?.name?.toLowerCase().replace(/\s+/g, "") ||
+    "user";
 
   return (
     <div className="flex flex-col gap-2 py-2">
       <div className="flex items-start gap-3 group relative">
         <Avatar className="w-9 h-9 shrink-0">
-          <Avatar.Image alt={commentCreator?.name || "User"} src={commentCreator?.photo || ""} />
-          <Avatar.Fallback>{commentCreator?.name?.split(" ").map((n) => n[0]).join("") || "U"}</Avatar.Fallback>
+          <Avatar.Image
+            alt={commentCreator?.name || "User"}
+            src={commentCreator?.photo || ""}
+          />
+          <Avatar.Fallback>
+            {commentCreator?.name
+              ?.split(" ")
+              .map((n) => n[0])
+              .join("") || "U"}
+          </Avatar.Fallback>
         </Avatar>
 
         <div className="flex flex-col flex-1">
           {isTop && (
-            <span className="text-[9px] font-bold text-gray-400 uppercase mb-0.5">Top Comment</span>
+            <span className="text-[9px] font-bold text-gray-400 uppercase mb-0.5">
+              Top Comment
+            </span>
           )}
 
           {/* مربع الكومنت */}
@@ -164,7 +228,9 @@ export default function Comment({
                   {commentCreator?.name || "User"}
                 </span>
                 <span className="text-[11px] text-gray-400">@{username}</span>
-                <span className="text-[11px] text-gray-400">· {formatTimeAgo(createdAt)}</span>
+                <span className="text-[11px] text-gray-400">
+                  · {formatTimeAgo(createdAt)}
+                </span>
               </div>
 
               {isOwner && (
@@ -200,7 +266,9 @@ export default function Comment({
                         className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 cursor-pointer"
                       >
                         <Trash size="14" color="#dc2626" variant="Outline" />
-                        <span>{deleteMutation.isPending ? "Deleting..." : "Delete"}</span>
+                        <span>
+                          {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                        </span>
                       </button>
                     </div>
                   )}
@@ -210,7 +278,10 @@ export default function Comment({
 
             {/* محتوى الكومنت */}
             {isEditing ? (
-              <form onSubmit={handleUpdateComment} className="mt-2 flex flex-col gap-2">
+              <form
+                onSubmit={handleUpdateComment}
+                className="mt-2 flex flex-col gap-2"
+              >
                 <input
                   type="text"
                   value={editText}
@@ -237,11 +308,17 @@ export default function Comment({
             ) : (
               <>
                 {content && (
-                  <p className="text-xs text-gray-800 mt-1.5 whitespace-pre-wrap leading-relaxed">{content}</p>
+                  <p className="text-xs text-gray-800 mt-1.5 whitespace-pre-wrap leading-relaxed">
+                    {content}
+                  </p>
                 )}
                 {image && (
                   <div className="mt-2 rounded-xl overflow-hidden border border-gray-200 bg-black flex justify-center max-h-[200px]">
-                    <img src={image} alt="Comment attachment" className="object-contain max-h-[200px] w-full" />
+                    <img
+                      src={image}
+                      alt="Comment attachment"
+                      className="object-contain max-h-[200px] w-full"
+                    />
                   </div>
                 )}
               </>
@@ -256,13 +333,22 @@ export default function Comment({
                 isLiked ? "text-blue-600" : "text-gray-500"
               }`}
             >
-              <Heart size="14" color={isLiked ? "#2563eb" : "#6b7280"} variant={isLiked ? "Bold" : "Outline"} />
-              <span>{isLiked ? "Liked" : "Like"} ({likesCountState})</span>
+              <Heart
+                size="14"
+                color={isLiked ? "#2563eb" : "#6b7280"}
+                variant={isLiked ? "Bold" : "Outline"}
+              />
+              <span>
+                {isLiked ? "Liked" : "Like"} ({likesCountState})
+              </span>
             </button>
 
             <button
               onClick={() => {
-                console.log("🖱️ [DEBUG] Clicked Reply button for Comment ID:", commentId);
+                console.log(
+                  "🖱️ [DEBUG] Clicked Reply button for Comment ID:",
+                  commentId,
+                );
                 setShowRepliesSection((prev) => !prev);
               }}
               className="hover:underline cursor-pointer font-semibold"
@@ -270,8 +356,8 @@ export default function Comment({
               {showRepliesSection
                 ? "Hide replies"
                 : totalReplies > 0
-                ? `Reply (${totalReplies})`
-                : "Reply"}
+                  ? `Reply (${totalReplies})`
+                  : "Reply"}
             </button>
           </div>
         </div>
@@ -283,17 +369,31 @@ export default function Comment({
           {serverReplies && serverReplies.length > 0 ? (
             <div className="flex flex-col gap-3">
               {serverReplies.map((reply: Reply) => (
-                <div key={reply._id || reply.id} className="flex items-start gap-3">
+                <div
+                  key={reply._id || reply.id}
+                  className="flex items-start gap-3"
+                >
                   <Avatar className="w-8 h-8 shrink-0">
-                    <Avatar.Image alt={reply.commentCreator?.name} src={reply.commentCreator?.photo} />
+                    <Avatar.Image
+                      alt={reply.commentCreator?.name}
+                      src={reply.commentCreator?.photo}
+                    />
                   </Avatar>
                   <div className="bg-gray-100/70 rounded-2xl px-3.5 py-2.5 max-w-md flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs text-gray-900">{reply.commentCreator?.name}</span>
-                      <span className="text-[10px] text-gray-400">{formatTimeAgo(reply.createdAt)}</span>
+                      <span className="font-bold text-xs text-gray-900">
+                        {reply.commentCreator?.name}
+                      </span>
+                      <span className="text-[10px] text-gray-400">
+                        {formatTimeAgo(reply.createdAt)}
+                      </span>
                     </div>
 
-                    {reply.content && <p className="text-xs text-gray-800 mt-1">{reply.content}</p>}
+                    {reply.content && (
+                      <p className="text-xs text-gray-800 mt-1">
+                        {reply.content}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -307,11 +407,17 @@ export default function Comment({
               <Avatar.Image alt={userData?.name} src={userData?.photo} />
             </Avatar>
 
-            <form onSubmit={handleSendReply} className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-3 shadow-xs flex flex-col gap-2 relative">
+            <form
+              onSubmit={handleSendReply}
+              className="flex-1 bg-gray-50 border border-gray-200 rounded-2xl p-3 shadow-xs flex flex-col gap-2 relative"
+            >
               <span className="text-[11px] text-gray-400">
-                Replying to <span className="font-semibold text-gray-600">{commentCreator?.name}</span>
+                Replying to{" "}
+                <span className="font-semibold text-gray-600">
+                  {commentCreator?.name}
+                </span>
               </span>
-              
+
               <textarea
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
@@ -322,7 +428,11 @@ export default function Comment({
 
               {imagePreview && (
                 <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-200">
-                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
                   <button
                     type="button"
                     onClick={() => {
@@ -374,7 +484,10 @@ export default function Comment({
 
                 <button
                   type="submit"
-                  disabled={replyMutation.isPending || (!replyText.trim() && !selectedImage)}
+                  disabled={
+                    replyMutation.isPending ||
+                    (!replyText.trim() && !selectedImage)
+                  }
                   className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition cursor-pointer disabled:opacity-40 flex items-center justify-center shadow-sm"
                 >
                   <Send2 size="16" color="#ffffff" variant="Bold" />

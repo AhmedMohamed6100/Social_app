@@ -76,7 +76,6 @@ export default function CreateComment({ postId }: { postId: string }) {
             };
           });
 
-          // مزامنة في الخلفية للتأكد من صحة البيانات
           queryClient.invalidateQueries({ queryKey: ["PostDetails", postId] });
           queryClient.invalidateQueries({ queryKey: ["postsComments", postId] });
           queryClient.invalidateQueries({ queryKey: ["posts"] });
